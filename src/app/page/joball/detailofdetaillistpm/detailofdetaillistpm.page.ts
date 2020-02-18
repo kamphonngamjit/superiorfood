@@ -379,7 +379,7 @@ export class DetailofdetaillistpmPage implements OnInit {
       this.title7 = "รายการที่ 4 แบบประเมินปัญหา"
       this.isenabledTakeback = false;
       this.isenabledcheck = false;
-      this.isenabledcuseva = true;
+      this.isenabledcuseva = false;
       this.isenabledrequest = false;
 
     } else if (this.jobtype == "INSTALL") {
@@ -2761,12 +2761,8 @@ export class DetailofdetaillistpmPage implements OnInit {
         if (this.list == 0) {
           this.isenabledcuseva = true;
         }
-        if (this.installID == '-') {
+        if (this.SerialNo == '-') {
           if (this.list.InstallPlanID != null) {
-            this.installID = this.list.InstallPlanID
-            this.InstallPlanName = this.list.InstallPlanName
-            this.ItemCode = this.list.ItemCode
-            this.ItemsName = this.list.ItemsName
             this.SerialNo = this.list.SerialNo
             console.log(this.InstallPlanName);
           }

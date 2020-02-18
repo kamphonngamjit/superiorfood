@@ -201,7 +201,7 @@
                   <button (click)="check()" [disabled]="!isenabledcheck" class="btn default">
                     รายการตรวจเช็ค </button>
                 </div>
-                <div #device class="col-md-6 col-6 text-center" style="padding-left: 10px;" *ngIf="installID == '-' else device">
+                <div #device class="col-md-6 col-6 text-center" style="padding-left: 10px;" *ngIf="SerialNo == '-' else device">
                   <button (click)="changspare('device')" [disabled]="!isenabledadddevice" class="btn default">
                     เพิ่มเครื่อง </button>
                 </div>
@@ -388,7 +388,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-12 col-sm-12 ex2" style="padding: 0px;" *ngIf="installID != '-' else havedevice" #havedevice>
+        <div class="col-12 col-md-12 col-sm-12 ex2" style="padding: 0px;">
           <div class="portlet box blue">
             <div class="portlet-title">
               <div class="caption">
@@ -414,7 +414,7 @@
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-12 col-sm-12 ex2" style="padding: 0px;" *ngIf="installID == '-' else device" #device>
+        <!-- <div class="col-12 col-md-12 col-sm-12 ex2" style="padding: 0px;" *ngIf="installID == '-' else device" #device>
           <div class="portlet box blue">
             <div class="portlet-title">
               <div class="caption">
@@ -439,7 +439,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         
       </div>
     </div>
