@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthServiceService } from '../../../auth-service.service';
 import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { NavController,AlertController } from '@ionic/angular';
 import { NavigationExtras } from '@angular/router';
 import { StorageService } from '../../../storage.service';
 import { PostDataService } from '../../../post-data.service';
@@ -29,17 +29,24 @@ export class CmPage implements OnInit {
   myempID: string;
   empid: any;
   listpm;
+  load = false;
   //#endregion
 
   //#region constructor
   constructor(public DataService: AuthServiceService,
     private route: ActivatedRoute,
+    public alertController: AlertController,
     public navCtrl: NavController,
     private storageService: StorageService,
     private postDataService: PostDataService) {
     this.json;
     this.listpmdetail = [];
     this.job = [];
+    this.route.queryParams.subscribe(params => {
+      this.listpm = null;
+      this.ngOnInit();
+      
+    });
     this.storageService.getUser().then(items => {
       this.items = items;
       // console.log(items);      
@@ -73,21 +80,48 @@ export class CmPage implements OnInit {
   //#region click
   click(item, data) {
     console.log(item);
-    let params = {
-      item: item.value,
-      type: this.type,
-      date: data.planDate,
+    let param = {
+      planID: item.value.planID,
+      empID: this.empid,
+      type: "checkstatus",
     }
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        data: JSON.stringify(params)
+    console.log(param);
+    
+    this.postDataService.postcheck(param).then(status => {
+      console.log(status);
+
+      if (status == true) {
+        let params = {
+          item: item.value,
+          type: this.type,
+          date: data.planDate,
+        }
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            data: JSON.stringify(params)
+          }
+        };
+        console.log(navigationExtras);
+        this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+      }else{
+        this.status();
       }
-    };
-    console.log(navigationExtras);
-    this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+    });    
+    console.log(item);
+    
   }
   //#endregion
 
+  //#region alert status
+  async status(){
+    const alert = await this.alertController.create({
+      message: 'ยังไม่ถึงกำหนดรอบการตรวจเช็ค',
+      buttons: ['OK']
+    });
+    await alert.present();
+  }  
+  //#endregion
+  
   //#region ChangeMonth
   ChangeMonth() {
     const month = new Date().getMonth() + 1;
@@ -189,6 +223,7 @@ export class CmPage implements OnInit {
 
   //#region changeMonthNext
   changeMonthNext(value) {
+    this.load = true;
     // const year = new Date().getFullYear();
     //#region nextmonth
     if (this.month == 'มกราคม') {
@@ -307,7 +342,9 @@ export class CmPage implements OnInit {
         }
 
         console.log('listpm', this.listpm);
-
+        if (this.listpm == false) {
+          this.load = false;
+        }
       });
     });
   }
@@ -315,6 +352,7 @@ export class CmPage implements OnInit {
 
   //#region changeMonthBack
   changeMonthBack(value) {
+    this.load = true;
     //#region 
     if (this.month == 'มกราคม') {
       this.month = 'ธันวาคม'
@@ -431,7 +469,9 @@ export class CmPage implements OnInit {
         }
 
         console.log('listpm', this.listpm);
-
+        if (this.listpm == false) {
+          this.load = false;
+        }
       });
     });
   }

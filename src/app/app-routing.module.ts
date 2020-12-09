@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { AuthGuardGuard } from '../app/auth/auth-guard.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', loadChildren: './login/login.module#LoginPageModule' },
-  { path: 'menu', loadChildren: './page/menu/menu.module#MenuPageModule' },
+  { path: 'menu', loadChildren: './page/menu/menu.module#MenuPageModule',canActivate:[AuthGuardGuard] },
   { path: 'home', loadChildren: './home/home.module#HomePageModule' },
   { path: 'job/jobdetail', loadChildren: './page/job/jobdetail/jobdetail.module#JobdetailPageModule' },
   { path: 'job/reportcheckpm', loadChildren: './page/job/reportcheckpm/reportcheckpm.module#ReportcheckpmPageModule' },
@@ -30,9 +31,16 @@ const routes: Routes = [
   { path: 'take', loadChildren: './page/take-spare-parts/take/take.module#TakePageModule' },
   { path: 'sparelist', loadChildren: './page/take-spare-parts/sparelist/sparelist.module#SparelistPageModule' },
   { path: 'take-new', loadChildren: './page/take-spare-parts/take-new/take-new.module#TakeNewPageModule' },
-  { path: 'changsparepart', loadChildren: './page/joball/detailofdetaillistpm/changsparepart/changsparepart.module#ChangsparepartPageModule' }
-
-
+  { path: 'changsparepart', loadChildren: './page/joball/detailofdetaillistpm/changsparepart/changsparepart.module#ChangsparepartPageModule' },
+  { path: 'changpassword', loadChildren: './page/setting/changpassword/changpassword.module#ChangpasswordPageModule' },
+  { path: 'sparepart', loadChildren: './page/sparepart/sparepart.module#SparepartPageModule' },
+  { path: 'waitspare', loadChildren: './page/take-spare-parts/waitspare/waitspare.module#WaitsparePageModule' },
+  { path: 'parts-waiting-list', loadChildren: './page/sparepart/parts-waiting-list/parts-waiting-list.module#PartsWaitingListPageModule' },
+  { path: 'iceimg', loadChildren: './page/detaillistpm/iceimg/iceimg.module#IceimgPageModule' },
+  { path: 'scanserial', loadChildren: './page/detaillistpm/scanserial/scanserial.module#ScanserialPageModule' },
+  { path: 'picserial', loadChildren: './page/detaillistpm/picserial/picserial.module#PicserialPageModule' },
+  { path: 'log', loadChildren: './page/detaillistpm/log/log.module#LogPageModule' },
+  { path: 'job/worknew', loadChildren: './page/job/worknew/worknew.module#WorknewPageModule' },
 
 ];
 

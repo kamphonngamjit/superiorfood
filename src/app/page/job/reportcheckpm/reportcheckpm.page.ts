@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthServiceService } from '../../../auth-service.service';
 import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
 import { NavigationExtras } from '@angular/router';
 import { StorageService } from '../../../storage.service';
 import { PostDataService } from '../../../post-data.service';
+import { NavController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-reportcheckpm',
@@ -29,14 +29,16 @@ export class ReportcheckpmPage implements OnInit {
   myempID: string;
   empid: any;
   listpm;
+  load = false;
   //#endregion
 
   //#region constructor
   constructor(public DataService: AuthServiceService,
+    public alertController: AlertController,
     private route: ActivatedRoute,
     public navCtrl: NavController,
     private storageService: StorageService,
-    private postDataService: PostDataService) {
+    private postDataService: PostDataService,) {
     this.json;
     this.listpmdetail = [];
     this.job = [];
@@ -49,7 +51,12 @@ export class ReportcheckpmPage implements OnInit {
         console.log(this.myempID);
       }
     });
+    this.route.queryParams.subscribe(params => {
+      this.listpm = null;
+      this.ChangeMonth();
+      this.ngOnInit();
 
+    });
     this.ChangeMonth()
     setTimeout(() => {
       this.ngOnInit();
@@ -73,23 +80,49 @@ export class ReportcheckpmPage implements OnInit {
   //#region click
   click(item, data) {
     console.log(item);
-    let params = {
-      item: item.value,
-      type: this.type,
-      date: data.planDate,
+    let param = {
+      planID: item.value.planID,
+      empID: this.empid,
+      type: "checkstatus",
     }
-    console.log(params);
+    console.log(param);
 
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        data: JSON.stringify(params)
+    this.postDataService.postcheck(param).then(status => {
+      console.log(status);
+
+      if (status == true) {
+        let params = {
+          item: item.value,
+          type: this.type,
+          date: data.planDate,
+        }
+        console.log(params);
+
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            data: JSON.stringify(params)
+          }
+        };
+        console.log(navigationExtras);
+        this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+      } else {
+        this.status();
       }
-    };
-    console.log(navigationExtras);
-    this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+    });
+
+
   }
   //#endregion
 
+  //#region alert status
+  async status() {
+    const alert = await this.alertController.create({
+      message: 'ยังไม่ถึงกำหนดรอบการตรวจเช็ค',
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+  //#endregion
   //#region ChangMonth
   ChangeMonth() {
     const month = new Date().getMonth() + 1;
@@ -134,7 +167,7 @@ export class ReportcheckpmPage implements OnInit {
       this.textShow = this.month + " " + this.intYear
     }
     if (this.intMonth == 8) {
-      this.month = 'สิงหาคม'      
+      this.month = 'สิงหาคม'
       this.intMonth = 8;
       this.textShow = this.month + " " + this.intYear
     }
@@ -196,6 +229,8 @@ export class ReportcheckpmPage implements OnInit {
   //#region ChangMonthNext
   changeMonthNext(value) {
     console.log(value);
+    this.load = true;
+
     // const year = new Date().getFullYear();
     //#region nextmonth
     if (this.month == 'มกราคม') {
@@ -264,7 +299,7 @@ export class ReportcheckpmPage implements OnInit {
     // }
     //#endregion
 
-    if (value == false) {      
+    if (value == false) {
       this.job.empID = this.empid;
       this.job.month = this.intMonth;
       this.job.year = this.intYear;
@@ -284,7 +319,7 @@ export class ReportcheckpmPage implements OnInit {
     }
 
     if (value != false) {
-      this.listpm = false;      
+      this.listpm = false;
     }
 
     this.storageService.getUser().then(items => {
@@ -309,6 +344,9 @@ export class ReportcheckpmPage implements OnInit {
         }
 
         console.log('listpm', this.listpm);
+        if (this.listpm == false) {
+          this.load = false;
+        }
 
       });
     });
@@ -317,6 +355,7 @@ export class ReportcheckpmPage implements OnInit {
 
   //#region ChangBack
   changeMonthBack(value) {
+    this.load = true;
     //#region backmonth
     if (this.month == 'มกราคม') {
       this.month = 'ธันวาคม'
@@ -428,7 +467,9 @@ export class ReportcheckpmPage implements OnInit {
         }
 
         // console.log('listpm', this.listpm);
-
+        if (this.listpm == false) {
+          this.load = false;
+        }
       });
     });
   }

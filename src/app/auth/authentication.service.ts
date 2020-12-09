@@ -52,9 +52,8 @@ export class AuthenticationService {
 
   login(id) {
     let name = JSON.stringify(id);
-    return this.storage.set(TOKEN_KEY, name).then(() => {
+    this.storage.set(TOKEN_KEY, name).then(() => {
       this.authenticationState.next(true);
-      this.saveuser(name);
     });
   }
  

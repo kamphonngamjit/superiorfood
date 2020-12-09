@@ -5,13 +5,15 @@
             <ion-title>ภาพรวมการทำงาน</ion-title>
         </ion-buttons>
         <ion-buttons slot="primary">
-            <ion-button (click)="Openpop($event)">
-                <ion-icon slot="icon-only" name="notifications"></ion-icon>
-                {{job}}
+            <ion-button (click)="GetBarcode()">
+                <ion-icon slot="icon-only" name="barcode"></ion-icon>
             </ion-button>
-            <ion-button (click)="loadpage()">
+            <!-- <ion-button (click)="Openpop($event)">
+                <i class="fa fa-bell"></i>&nbsp;{{job}}
+            </ion-button> -->
+            <!-- <ion-button (click)="loadpage()">
                 <ion-icon slot="icon-only" name="refresh"></ion-icon>
-            </ion-button>
+            </ion-button> -->
         </ion-buttons>
     </ion-toolbar>
 </ion-header>
@@ -20,7 +22,7 @@
     <div class="container-fluid">
         <div class="page-content-inner">
             <div class="row" style="padding:5px;">
-                <div class="col-8 col-md-8" style="padding: 0px;">
+                <div class="col-md-8" style="padding-left:2px;padding-right: 2px;margin-top: 3px;">
                     <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
@@ -56,7 +58,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="portlet box blue">
+                    <div class="portlet box blue" style="margin-top: 5px;">
                         <div class="portlet-title">
                             <div class="caption">
                                 <i class="fa fa-spinner"></i>งานที่ยัง UPLOAD ไม่เสร็จ</div>
@@ -64,20 +66,59 @@
                         </div>
                         <div class="portlet-body" style="padding: 2px;">
                             <label class="col-6">ทั้งหมด</label>
-                            <label class="col-6 text-right">{{job}}</label>
+                            <label class="col-6 text-right">{{jobupload}}</label>
                         </div>
                     </div>
-
+                    <div class="portlet box blue" style="margin-top: 5px;">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-wrench"></i>งานทั้งหมด
+                            </div>
+                            <div class="tools">
+                                <ion-icon (click)="loadpage()" slot="icon-only" name="refresh"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="portlet-body" style="padding: 2px;">
+                            <div (click)="next('worknew')">
+                                <label class="col-6">งานใหม่</label>
+                                <label class="col-6 text-right">{{worknew}}</label>
+                            </div>
+                            <div (click)="next('pm')">
+                                <label class="col-6">PM</label>
+                                <label class="col-6 text-right">{{pm}}</label>
+                            </div>
+                            <div (click)="next('cm')">
+                                <label class="col-6">TK</label>
+                                <label class="col-6 text-right">{{cm}}</label>
+                            </div>
+                            <div (click)="next('install')">
+                                <label class="col-6">INSTALL</label>
+                                <label class="col-6 text-right">{{install}}</label>
+                            </div>
+                            <div (click)="next('uninstall')">
+                                <label class="col-6">UNINSTALL</label>
+                                <label class="col-6 text-right">{{uninstall}}</label>
+                            </div>
+                            <div (click)="next('waiting')">
+                                <label class="col-6">รายการรอรับอะไหล่</label>
+                                <label class="col-6 text-right">{{wait}}</label>
+                            </div>
+                            <div (click)="next('ice')">
+                                <label class="col-6">ชั่งน้ำแข็ง</label>
+                                <label class="col-6 text-right">{{ice}}</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-4 col-md-4" style="padding:0px; padding-left:5px;">
+                <div class="col-md-4" style="padding-left:2px;padding-right: 2px;margin-top: 3px;">
                     <div class="portlet box blue">
                         <div class="portlet-title">
                             <div class="caption">
                                 <i class="fa fa-user"></i>ข้อมูลพนักงาน</div>
 
                         </div>
-                        <div class="portlet-body" style="padding: 2px;">
+                        <div class="portlet-body" style="padding: 3px;">
                             <label class="col-4">ชื่อ</label>
                             <label class="col-8">{{ name }}</label>
                             <label class="col-4">ชื่อผู้ใช้</label>
@@ -86,22 +127,7 @@
                             <label class="col-8">{{ position }}</label>
                         </div>
                     </div>
-                    <div class="portlet box blue">
-                        <div class="portlet-title">
-                            <div class="caption">
-                                <i class="fa fa-compass"></i>ข้อมูลระบบ</div>
 
-                        </div>
-                        <div class="portlet-body" style="padding: 2px;">
-                            <label class="col-4">พื้นที่ว่าง</label>
-                            <label class="col-8">6.73 Gb</label>
-                            <label class="col-4">App Ver.</label>
-                            <label class="col-8">1.000</label>
-                            <!-- <button ion-button color="food" (click)="Take()">take photo</button>
-
-                            <p align="center"><img src="{{myphoto}}"></p> -->
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

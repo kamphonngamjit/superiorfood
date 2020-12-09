@@ -2,7 +2,7 @@
     <ion-toolbar color="primary">
       <ion-buttons slot="start">
         <ion-back-button></ion-back-button>
-        <ion-title>รายการซ่อมบำรุง (CM) ของ {{name}}</ion-title>
+        <ion-title>รายการซ่อมบำรุง (TK) ของ {{name}}</ion-title>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -15,13 +15,16 @@
                 <div class="btn-group btn-group btn-group-justified btn-lg" style="padding: 0px; width: 100%;">
                     <button href="javascript:;" class="btn default btn-lg" style="padding: 5px;"
                         (click)="ChangeMonth()"> ปัจจุบัน </button>
-                    <button href="javascript:;" class="btn blue btn-lg" style="width: 50%; padding: 5px;"> รายการซ่อมบำรุง (CM)
+                    <button href="javascript:;" class="btn blue btn-lg" style="width: 50%; padding: 5px;"> รายการซ่อมบำรุง (TK)
                         เดือน{{textShow}} </button>
                     <button href="javascript:;" class="btn default btn-lg" style="padding: 5px;"
                         (click)="changeMonthBack(listpm)"> ก่อนหน้า </button>
                     <button href="javascript:;" class="btn default btn-lg" style="padding: 5px;"
                         (click)="changeMonthNext(listpm)"> ถัดไป </button>
                 </div>
+            </div>
+            <div class="centered">
+                <ion-spinner name="lines" *ngIf="listpm == null || load == true"></ion-spinner>
             </div>
             <div class="col-12" #lblData *ngIf="listpm != false; else lblData" style="padding-top: 10px; padding: 0px;">
                 <div class="portlet box blue" *ngFor="let data of listpm">
@@ -34,27 +37,38 @@
                         <ul class="list-group">
                             <li *ngFor="let item of data.customerdata | keyvalue" (click)="click(item,data)"
                                 class="list-group-item">
-                                <i class="fa fa-square-o" #lblSuccess
-                                    *ngIf="item.value.WorkAll != item.value.WorkFinish; else lblSuccess">
-                                </i>
-                                <i class="fa fa-check-square-o" #lblInstall
-                                    *ngIf="item.value.WorkAll == item.value.WorkFinish; else lblInstall">
-                                </i>
-                                {{ item.value.Customer }}
-                                <div class="pull-right">
-                                    <div class="badge badge-default bg-blue"
-                                        style="margin:5px;" style="font-size: 0.9em;">ซ่อม : {{ item.value.WorkAll }}
-                                        สำเร็จ : {{ item.value.WorkFinish }}
+                                <div class="row">
+                                    <div class="col-8">
+                                        <i class="fa fa-square-o" #lblSuccess
+                                        *ngIf="item.value.WorkAll != item.value.WorkFinish; else lblSuccess">
+                                    </i>
+                                    <i class="fa fa-check-square-o" #lblInstall
+                                        *ngIf="item.value.WorkAll == item.value.WorkFinish; else lblInstall">
+                                    </i>
+                                    {{ item.value.Customer }} {{item.value.CustomerEng}}
                                     </div>
-                                </div>
+                                    <div class="col-4">
+                                        <div class="pull-right">
+                                            <div class="badge badge-default bg-blue" style="margin:5px;"
+                                                style="font-size: 0.9em;">ซ่อม : {{ item.value.WorkAll }}
+                                                สำเร็จ : {{ item.value.WorkFinish }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>   
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="col-12" style="text-align: center; margin-top: 20px;" #lblWait *ngIf="listpm == false; else lblWait">
+            <div class="col-12" style="text-align: center; margin-top: 20px;"  *ngIf="listpm == false && load == false">
                 <label>ไม่พบข้อมูล</label>
             </div>
         </div>
     </div>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button>
+            <ion-icon name="alert"></ion-icon>
+        </ion-fab-button>
+    </ion-fab>
 </ion-content>

@@ -7,6 +7,9 @@ import { StorageService } from '../../../storage.service';
 import { from } from 'rxjs';
 import { ModalController } from '@ionic/angular';
 import { ShowimginstallPage } from '../../job/showimginstall/showimginstall.page';
+import { CustomerevaluationPage } from '../detailofdetaillistpm/customerevaluation/customerevaluation.page';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
+import { LogPage } from '../../detaillistpm/log/log.page';
 
 @Component({
   selector: 'app-detaillistpm',
@@ -16,6 +19,17 @@ import { ShowimginstallPage } from '../../job/showimginstall/showimginstall.page
 export class DetaillistpmPage implements OnInit {
 
   //#region data
+  detail;
+  resolution;
+  resolutiondetail;
+  getworkclose
+  getworkclose1;
+  getworkclose2;
+  getworkclose3;
+  text;
+  getworkclosevalue1;
+  getworkclosevalue2;
+  getworkclosevalue3;
   myId;
   workfinish;
   cusID;
@@ -35,6 +49,8 @@ export class DetaillistpmPage implements OnInit {
   new = false;
   imgbf = false;
   sparetype;
+  statusserial;
+  datacm;
   //#endregion
 
   //#region constructor
@@ -43,7 +59,8 @@ export class DetaillistpmPage implements OnInit {
     private postDataService: PostDataService,
     private storageService: StorageService,
     public alertController: AlertController,
-    public modalController: ModalController, ) {
+    public modalController: ModalController,
+    private barcodeScanner: BarcodeScanner,) {
     this.detaillistpm = [];
 
     this.route.queryParams.subscribe(params => {
@@ -51,13 +68,107 @@ export class DetaillistpmPage implements OnInit {
       this.item = this.myId.item
       this.type = this.myId.type
       this.date = this.myId.date
-
+      this.datacm = this.myId.datacm
       this.cusID = this.item.cusID
       this.planID = this.item.planID
       this.workfinish = this.item.WorkFinish
       this.month = this.item.month
       this.year = this.item.year
-      console.log("receive", this.type);
+      console.log("receive", this.myId);
+      console.log("item", this.item);
+      console.log("type", this.type);
+      console.log("planID", this.planID);
+      if (this.type == "getPM") {
+        this.detaillistpm.PlanID = this.planID,
+          this.detaillistpm.jobtype = "SuccessPM"
+        console.log(this.detaillistpm);
+        this.postDataService.postGetList(this.detaillistpm).then(work => {
+          this.data = work;
+          console.log(this.data);
+          for (let i = 0; i < this.data.length; i++) {
+            this.Customername = this.data[i].CustomerName;
+            this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
+            for (let j = 0; j < this.data[i].productInstall.length; j++) {
+              console.log(this.data[i].productInstall[j]);
+            }
+          }
+        });
+        this.type = "PM";
+      }
+      else if (this.type == "getIN") {
+        this.imgbf = true
+        this.detaillistpm.PlanID = this.planID,
+          this.detaillistpm.jobtype = "SuccessIN"
+        console.log(this.detaillistpm);
+        this.postDataService.postGetList(this.detaillistpm).then(work => {
+          this.data = work;
+          console.log(this.data);
+          for (let i = 0; i < this.data.length; i++) {
+            this.Customername = this.data[i].CustomerName;
+            this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
+            for (let j = 0; j < this.data[i].productInstall.length; j++) {
+              console.log(this.data[i].productInstall[j]);
+            }
+          }
+        });
+        this.type = "INSTALL";
+      }
+      else if (this.type == "getCM") {
+        this.imgbf = true
+        this.detaillistpm.PlanID = this.planID,
+          this.detaillistpm.jobtype = "SuccessCM"
+        console.log(this.detaillistpm);
+        this.postDataService.postDetailListpm(this.detaillistpm).then(work => {
+          this.data = work;
+          console.log(this.data);
+          for (let i = 0; i < this.data.length; i++) {
+            this.Customername = this.data[i].CustomerName;
+            this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
+          }
+        });
+        let workclose = {
+          jobtype: "getworkclose"
+        }
+        console.log(workclose);
+        this.postDataService.SaveCaseAll(workclose).then(data => {
+          this.getworkclose = data
+          console.log(data);
+          for (let i = 0; i < this.getworkclose.length; i++) {
+            console.log(this.getworkclose);
+            if (i == 1) {
+              this.getworkclose1 = this.getworkclose[1].SystemDataName;
+              this.getworkclosevalue1 = this.getworkclose[1].SystemID;
+              this.text = 'ปิดงาน'
+            } else if (i == 3) {
+              this.getworkclose2 = this.getworkclose[3].SystemDataName;
+              this.getworkclosevalue2 = this.getworkclose[3].SystemID;
+              this.text = 'ตกลง'
+            } else if (i == 0) {
+              this.getworkclose3 = this.getworkclose[0].SystemDataName;
+              this.getworkclosevalue3 = this.getworkclose[0].SystemID;
+              this.text = 'บันทึก'
+            }
+          }
+        });
+        this.type = "CM";
+      }
+      else if (this.type == "getUN") {
+        this.detaillistpm.PlanID = this.planID,
+          this.detaillistpm.jobtype = "SuccessUN"
+        console.log(this.detaillistpm);
+        this.postDataService.postGetList(this.detaillistpm).then(work => {
+          this.data = work;
+          console.log(this.data);
+          for (let i = 0; i < this.data.length; i++) {
+            this.Customername = this.data[i].CustomerName;
+            this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
+            for (let j = 0; j < this.data[i].productInstall.length; j++) {
+              console.log(this.data[i].productInstall[j]);
+            }
+          }
+        });
+        this.type = "UNINSTALL";
+      }
     });
   }
 
@@ -92,6 +203,30 @@ export class DetaillistpmPage implements OnInit {
             this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
           }
         });
+      });
+      let workclose = {
+        jobtype: "getworkclose"
+      }
+      console.log(workclose);
+      this.postDataService.SaveCaseAll(workclose).then(data => {
+        this.getworkclose = data
+        console.log(data);
+        for (let i = 0; i < this.getworkclose.length; i++) {
+          console.log(this.getworkclose);
+          if (i == 1) {
+            this.getworkclose1 = this.getworkclose[1].SystemDataName;
+            this.getworkclosevalue1 = this.getworkclose[1].SystemID;
+            this.text = 'ปิดงาน'
+          } else if (i == 3) {
+            this.getworkclose2 = this.getworkclose[3].SystemDataName;
+            this.getworkclosevalue2 = this.getworkclose[3].SystemID;
+            this.text = 'ตกลง'
+          } else if (i == 0) {
+            this.getworkclose3 = this.getworkclose[0].SystemDataName;
+            this.getworkclosevalue3 = this.getworkclose[0].SystemID;
+            this.text = 'บันทึก'
+          }
+        }
       });
     }
     if (this.type == "INSTALL") {
@@ -161,18 +296,273 @@ export class DetaillistpmPage implements OnInit {
 
   //#endregion
 
+  async popupclose(item, header, workclose) {
+    console.log(item);
+
+    const modal = await this.modalController.create({
+      component: CustomerevaluationPage,
+      cssClass: 'my-custom-modal-css',
+      componentProps: {
+        installID: item.installId,
+        planID: item.planID,
+        jobtype: this.type,
+        header: header,
+        empID: this.empID,
+        workclose: workclose,
+        item: this.item,
+        date: this.date
+      }
+    });
+    modal.onDidDismiss().then(data => {
+    })
+    return await modal.present();
+  }
+
+viewpic(data,item){
+  let params = { 
+    empID: this.empID,
+    data: data,
+    item: item,
+    type:this.type,      
+  }
+  console.log(params);
+
+  const navigationExtras: NavigationExtras = {
+    queryParams: {
+      data: JSON.stringify(params)
+    }
+  };
+  this.navCtrl.navigateForward(['/picserial'], navigationExtras);
+}
+
+  scan(data, item){
+    console.log("data"+data);
+  console.log("item"+item);
+    if (this.type == "PM" || this.type == "CM") {
+      
+    
+    let params = {
+      installID: item.installId,
+      typedevice: "checkserial"
+    }
+    console.log(params);
+    this.postDataService.postdevice(params).then(statusserial => {
+      this.statusserial = statusserial;
+      console.log(this.statusserial);      
+      if (this.statusserial != false) {
+        this.click(data, item)
+      }else{
+        let tran = {
+          AssetID: item.AssetID,
+          Serial: item.Serial,
+          planID: item.planID,
+          empID: this.empID,
+          insID: item.installId,
+          type: this.type
+        }
+        console.log(tran);
+
+        this.postDataService.postTranService(tran).then(TranService => {
+          let params = { 
+            empID: this.empID,
+            data: data,
+            item: item,
+            type:this.type,      
+          }
+          console.log(params);
+      
+          const navigationExtras: NavigationExtras = {
+            queryParams: {
+              data: JSON.stringify(params)
+            }
+          };
+          this.navCtrl.navigateForward(['/picserial'], navigationExtras);
+        });        
+      } 
+    });   
+    }else{
+      this.click(data, item)
+    } 
+  }
   //#region click
   async click(data, item) {
-    console.log('Data', data);
+    console.log('Data', data); 
     console.log('item', item);
     if (item.Workfinish == 0) {
       if (item.status == "Pending") {
         const alert = await this.alertController.create({
-          message: 'กรุณาติดต่อผู้ดูลระบบ',
+          message: 'กรุณาติดต่อแอดมินบริษัทสุพีเรีย',
           buttons: ['OK']
         });
         await alert.present();
-      }else{
+      } else if (this.type == "CM") {
+        if (item.WorkCloseID != null) {
+          let tran = {
+            AssetID: item.AssetID,
+            Serial: item.Serial,
+            planID: item.planID,
+            empID: this.empID,
+            insID: item.installId,
+            type: this.type
+          }
+          console.log(tran);
+
+          this.postDataService.postTranService(tran).then(TranService => {
+            // console.log(TranService);  
+          });
+          let params = {
+            planID: item.planID,
+            install: item,
+            data: data,
+            insID: item.installId,
+            sparetype: item.sparepart,
+            item: item,
+            type: this.type,
+            date: this.date,
+          }
+          console.log(params);
+
+          const navigationExtras: NavigationExtras = {
+            queryParams: {
+              data: JSON.stringify(params)
+            }
+          };
+          this.navCtrl.navigateForward(['joball/listpm/detailofdetaillistpm'], navigationExtras);
+          console.log("sent", navigationExtras);
+        } else {
+          let alert = await this.alertController.create({
+            cssClass: 'custom-alert',
+            message: 'กรุณาเลือกการปิดงาน',
+            inputs: [
+              {
+                
+                type: 'radio',
+                label: this.getworkclose2,
+                value: this.getworkclosevalue2
+              },
+              {
+                type: 'radio',
+                label: this.getworkclose3,
+                value: this.getworkclosevalue3
+              }
+            ],
+            buttons:
+              [{
+                text: this.text,
+                handler: value => {
+                  console.log(value);
+                  if (value == this.getworkclosevalue1) {
+                    let params = {
+                      planID: item.planID,
+                      installID: item.installId,
+                      empID: this.empID,
+                      jobtype: "saveclose",
+                      workclose: value
+                    }
+                    console.log(params);
+                    this.postDataService.SaveCaseAll(params).then(result => {
+                      console.log(result);
+                      if (result == true) {
+                        this.imgbf = true
+                        this.detaillistpm.PlanID = item.planID,
+                          this.detaillistpm.jobtype = "SuccessCM"
+                        console.log(this.detaillistpm);
+                        this.postDataService.postDetailListpm(this.detaillistpm).then(work => {
+                          this.data = work;
+                          console.log(this.data);
+                          for (let i = 0; i < this.data.length; i++) {
+                            this.Customername = this.data[i].CustomerName;
+                            this.data[i].productInstall = JSON.parse(this.data[i].productInstall);
+                          }
+                        });
+                        this.alertSuccess();
+                        //this.navCtrl.navigateForward(['/menu/overview']);
+                      }
+                      if (data == false) {
+                        this.alertFail();
+                      }
+                    });
+                  }
+                  else if (value == this.getworkclosevalue2) {
+                    this.UpdateInprogresss();
+                    let tran = {
+                      AssetID: item.AssetID,
+                      Serial: item.Serial,
+                      planID: item.planID,
+                      empID: this.empID,
+                      insID: item.installId,
+                      type: this.type,
+                      workclose: value
+                    }
+                    console.log(tran);
+
+                    this.postDataService.postTranService(tran).then(TranService => {
+                      // console.log(TranService);  
+                    });
+                    let params = {
+                      planID: item.planID,
+                      install: item,
+                      data: data,
+                      insID: item.installId,
+                      sparetype: item.sparepart,
+                      item: item,
+                      type: this.type,
+                      date: this.date,
+                    }
+                    console.log(params);
+
+                    const navigationExtras: NavigationExtras = {
+                      queryParams: {
+                        data: JSON.stringify(params)
+                      }
+                    };
+                    this.navCtrl.navigateForward(['joball/listpm/detailofdetaillistpm'], navigationExtras);
+                    console.log("sent", navigationExtras);
+                  }
+                  else if (value == this.getworkclosevalue3) {
+                    this.popupclose(item, this.getworkclose3, value)
+                  }
+                }
+              }]
+          });
+          await alert.present();
+        }
+      }
+      if (item.tranID != null && this.type != "CM") {
+        let tran = {
+          AssetID: item.AssetID,
+          Serial: item.Serial,
+          planID: item.planID,
+          empID: this.empID,
+          insID: item.installId,
+          type: this.type
+        }
+        console.log(tran);
+
+        this.postDataService.postTranService(tran).then(TranService => {
+          // console.log(TranService);  
+        });
+        let params = {
+          planID: item.planID,
+          install: item,
+          data: data,
+          insID: item.installId,
+          sparetype: item.sparepart,
+          item: this.item,
+          type: this.type,
+          date: this.date,
+        }
+        console.log(params);
+
+        const navigationExtras: NavigationExtras = {
+          queryParams: {
+            data: JSON.stringify(params)
+          }
+        };
+        this.navCtrl.navigateForward(['joball/listpm/detailofdetaillistpm'], navigationExtras);
+        console.log("sent", navigationExtras);
+      }
+      else if ((item.tranID == null && this.type != "CM")) {
         const alert = await this.alertController.create({
           header: 'แจ้งเตือน!',
           message: 'ต้องการเริ่มทำงาน',
@@ -189,19 +579,22 @@ export class DetaillistpmPage implements OnInit {
                   type: this.type
                 }
                 console.log(tran);
-  
+
                 this.postDataService.postTranService(tran).then(TranService => {
                   // console.log(TranService);  
                 });
                 let params = {
                   planID: item.planID,
                   install: item,
-                  data:data,
+                  data: data,
                   insID: item.installId,
-                  sparetype: item.sparepart
+                  sparetype: item.sparepart,
+                  item: this.item,
+                  type: this.type,
+                  date: this.date,
                 }
                 console.log(params);
-  
+
                 const navigationExtras: NavigationExtras = {
                   queryParams: {
                     data: JSON.stringify(params)
@@ -220,27 +613,33 @@ export class DetaillistpmPage implements OnInit {
           ]
         });
         await alert.present();
-      }   
+      }
     }
 
     if (item.Workfinish == 1) {
       if (this.type == "CM") {
-        let params = {
-          data: data,
-          installID: item.newinstallID,
-          tranID: item.tranID,
-          planID: item.planID,
-          type: this.type
-        }
-        console.log(params);
+        if (item.WorkCloseID == "WorkClose001" || item.WorkCloseID == "WorkClose003") {
 
-        const navigationExtras: NavigationExtras = {
-          queryParams: {
-            data: JSON.stringify(params)
+
+        } else {
+          let params = {
+            data: data,
+            newinstallID: item.newinstallID,
+            installID: item.installId,
+            tranID: item.tranID,
+            planID: item.planID,
+            type: this.type
           }
-        };
-        this.navCtrl.navigateForward(['/job/jobdetail'], navigationExtras);
-        console.log("sent", navigationExtras);
+          console.log(params);
+
+          const navigationExtras: NavigationExtras = {
+            queryParams: {
+              data: JSON.stringify(params)
+            }
+          };
+          this.navCtrl.navigateForward(['/job/jobdetail'], navigationExtras);
+          console.log("sent", navigationExtras);
+        }
       }
       else if (this.type != "CM") {
         let params = {
@@ -265,6 +664,20 @@ export class DetaillistpmPage implements OnInit {
 
   //#endregion
 
+  
+  UpdateInprogresss(){
+    let params = {
+      installID: this.insID,
+      planID: this.planID,
+      typedevice: "UpdateInprogresss",
+      empID: this.empID
+    }
+    console.log(params);
+    this.postDataService.postdevice(params).then(status => {
+      console.log(status);
+    });
+  }
+
   //#region Imgbf
   async Imgbf(item) {
     console.log(item);
@@ -283,4 +696,231 @@ export class DetaillistpmPage implements OnInit {
     }
   }
   //#endregion
+
+  //#region 
+  showSpareHistory(value) {
+    console.log(value);
+    let params = {
+      empID: this.empID,
+      insID: value.installId,
+      planID: value.planID,
+      item: this.item,
+      type: this.type,
+      date: this.date,
+      ItemsName: value.ItemsName,
+      Type: "history"
+    }
+    console.log(params);
+
+    const navigationExtras: NavigationExtras = {
+      queryParams: {
+        data: JSON.stringify(params)
+      }
+    };
+    this.navCtrl.navigateForward(['/sparepart'], navigationExtras);
+
+    console.log(navigationExtras);
+  }
+  //#endregion
+
+  //#region 
+  showSpare(value) {
+    console.log(value);
+
+    let params = {
+      empID: this.empID,
+      insID: value.installId,
+      planID: value.planID,
+      item: this.item,
+      type: this.type,
+      date: this.date,
+      ItemsName: value.ItemsName,
+      Type: "Sparepart"
+    }
+    console.log(params);
+
+    const navigationExtras: NavigationExtras = {
+      queryParams: {
+        data: JSON.stringify(params)
+      }
+    };
+    this.navCtrl.navigateForward(['/sparepart'], navigationExtras);
+
+    console.log(navigationExtras);
+  }  //#endregion
+
+  //#region alert success
+  async alertSuccess() {
+    const alert = await this.alertController.create({
+      header: 'แจ้งเตือน',
+      message: 'บันทึกสำเร็จ',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+  //#endregion
+
+  //#region alert success
+  async alertFail() {
+    const alert = await this.alertController.create({
+      header: 'แจ้งเตือน',
+      message: 'บันทึกไม่สำเร็จ',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+  //#endregion
+  SaveSerial(value) {
+    console.log(value);
+    let params = {
+      insID: value.installId,
+      Type: "UpdateSerial",
+      EmpID: this.empID,
+      SerialNo:value.SerialNo
+    }
+    console.log(params);
+    this.postDataService.PostCus(params).then(status => {
+      console.log(status);      
+    });
+  }
+  SaveSerialBarcode(value){
+    this.barcodeScanner.scan().then(barcodeData => {
+      let barcode = barcodeData
+      if (barcode != null || barcode.text != '') {
+        let params = {
+          insID: value.installId,
+          Type: "UpdateSerial",
+          EmpID: this.empID,
+          SerialNo:barcode.text
+        }
+        console.log(params);
+        this.postDataService.PostCus(params).then(status => {
+          console.log(status);      
+        });
+        this.ngOnInit();
+      }
+    }).catch(err => {
+      console.log('Error', err);
+    });
+  }
+  fab(){
+    console.log('test');
+  }
+  imgice(value){
+    console.log(value);
+
+    let params = {
+      empID: this.empID,
+      insID: value.installId,
+      planID: value.planID,
+      ItemName:value.ItemsName,
+      CustomerName:this.Customername,      
+    }
+    console.log(params);
+
+    const navigationExtras: NavigationExtras = {
+      queryParams: {
+        data: JSON.stringify(params)
+      }
+    };
+    this.navCtrl.navigateForward(['/iceimg'], navigationExtras);
+
+    console.log(navigationExtras);
+  }
+
+  async assign() {
+    let alert = this.alertController.create({
+      message: 'ตอบรับงาน',
+      inputs: [
+        {        
+          name: 'date',
+          placeholder: 'วันที่',
+          type: 'date'
+        },
+        {
+          name: 'time',
+          placeholder: 'เวลา',
+          type: 'time'
+        },
+        {
+          name: 'remark',
+          placeholder: 'หมายเหตุ',
+          type: 'text'
+        }
+      ],
+      buttons: [
+        {
+          text: 'ยกเลิก',
+          role: 'cancel',
+          handler: data => {
+            
+          }
+        },
+        {
+          text: 'บันทึก',
+          handler: data => {
+            this.saveAssign(data)
+          }
+        }
+      ]
+    });
+    (await alert).present();
+  }
+  saveAssign(data){
+    console.log(data);
+    if (data.date == '' || data.time == '' || data.remark == '') {
+      this.alertAssign();
+    }else{
+      let params = {
+        insID: this.insID,
+        planID:this.planID,
+        typedevice: "SaveAssignCM",
+        empID: this.empID,
+        remark:data.remark,
+        time:data.time,
+        date:data.date +' '+ data.time
+      }
+      console.log(params);
+      this.postDataService.postdevice(params).then(status => {
+        console.log(status);     
+        if (status == true) {
+          this.alertSuccess();
+          this.type == "CM"
+          this.ngOnInit();
+        } 
+      });
+    }
+  }
+
+  //#region alert success
+  async alertAssign() {
+    const alert = await this.alertController.create({
+      header: 'แจ้งเตือน',
+      message: 'กรุณากรอกข้อมูลให้ครบ',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+  }
+  //#endregion
+
+  async logs() {
+    const modal = await this.modalController.create({
+      component: LogPage,
+      cssClass: 'my-custom-modal-css-pm',
+      componentProps: {
+        empID: this.empID,
+        insID: this.insID,
+        planID: this.planID,
+      }
+    });
+    modal.onDidDismiss().then(data => {
+      console.log(data);
+    })
+    return await modal.present();
+  }
+
 }
+ 

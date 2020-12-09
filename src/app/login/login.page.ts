@@ -7,6 +7,8 @@ import { StorageService, User } from '../storage.service';
 import { Network } from '@ionic-native/network/ngx';
 import { AuthenticationService } from '../auth/authentication.service';
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -33,6 +35,9 @@ export class LoginPage implements OnInit {
   url: SafeResourceUrl;
   Tablet;
   link;
+  disconnectSubscription;
+  connectSubscription;
+  text ="";
   //#endregion
 
   //#region constructor
@@ -46,45 +51,46 @@ export class LoginPage implements OnInit {
     private network: Network,
     private authService: AuthenticationService,
     private DataService: AuthServiceService,
-    sanitizer: DomSanitizer,) {
-    this.checkNetwork();
+    sanitizer: DomSanitizer,
+    private router: Router,
+    private route: ActivatedRoute,) {    
+      this.network.onDisconnect().subscribe(() => {
+        this.text = "...กรุณาเชื่อมต่ออินเทอร์เน็ต..."        
+      });
+
     setTimeout(() => {
       this.ngOnInit();
+      // this.checkNetwork();
     }, 500);
 
     this.user = [];
-    this.url = sanitizer.bypassSecurityTrustResourceUrl('http://superior2.wingplusweb.com/Web/CK_Evaluation.aspx' + '?empID=b99f4959-d1e7-44ec-98e2-07a6d0247a6b' + '&serviceplanid=74179' + '&installplanid=f2682a00-469c-49d6-9fc6-a371c5c21781');
-
+    this.route.queryParams.subscribe(params => {
+      this.authService.authenticationState.subscribe(state => {
+        if (state) {
+          this.router.navigate(['/menu/overview']);
+        } else {
+          this.router.navigate(['login']);
+        }
+      });
+      
+    });
+    
   }
   //#endregion
 
 
   //#region Check Network
   checkNetwork() {
-    // watch network for a disconnection
-    let disconnectSubscription = this.network.onDisconnect().subscribe(() => {
-      console.log('network was disconnected :-(');
+    this.network.onDisconnect().subscribe(() => {
+      alert('network was disconnected :-(');
     });
-
-    // stop disconnect watch
-    disconnectSubscription.unsubscribe();
-
-
-    // watch network for a connection
-    let connectSubscription = this.network.onConnect().subscribe(() => {
-      console.log('network connected!');
+    this.network.onConnect().subscribe(() => {
+      alert('network connected!');
       // We just got a connection but we need to wait briefly
-      // before we determine the connection type. Might need to wait.
+       // before we determine the connection type. Might need to wait.
       // prior to doing any api requests as well.
-      setTimeout(() => {
-        if (this.network.type === 'wifi') {
-          console.log('we got a wifi connection, woohoo!');
-        }
-      }, 3000);
+      
     });
-
-    // stop connect watch
-    connectSubscription.unsubscribe();
   }
 
   //#endregion
@@ -168,6 +174,9 @@ export class LoginPage implements OnInit {
     console.log(this.newUser);
     
     this.authService.login(this.newUser);
+    this.storageService.addUser(this.newUser).then(item => {
+      this.newUser = <User>{};
+    });
   }
 
   //#endregion
@@ -184,9 +193,11 @@ export class LoginPage implements OnInit {
 
   //#region start
   ngOnInit() {
-    this.storageService.resetLocalStorage();
+    //this.storageService.resetLocalStorage();
     // this.checkspace();
+    
   }
   //#endregion
 
 }
+ 

@@ -16,4 +16,12 @@
     งานถอนการติดตั้ง
     <ion-badge slot="end" color="tertiary">{{uninstall}}</ion-badge>
   </ion-item>
+  <ion-item (click)="next('waiting')">
+    รอรับอะไหล่
+    <ion-badge slot="end" color="danger">{{wait}}</ion-badge>
+  </ion-item>
+  <ion-item (click)="next('ice')">
+    ชั่งน้ำแข็ง
+    <ion-badge slot="end" color="medium">{{ice}}</ion-badge>
+  </ion-item>
 </div>

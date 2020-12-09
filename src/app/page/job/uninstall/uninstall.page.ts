@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthServiceService } from '../../../auth-service.service';
 import { ActivatedRoute } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { NavController, AlertController } from '@ionic/angular';
 import { NavigationExtras } from '@angular/router';
 import { StorageService } from '../../../storage.service';
 import { PostDataService } from '../../../post-data.service';
@@ -29,19 +29,26 @@ export class UninstallPage implements OnInit {
   myempID: string;
   empid: any;
   listpm;
+  load = false;
   //#endregion
 
   //#region constructor
   constructor(public DataService: AuthServiceService,
     private route: ActivatedRoute,
     public navCtrl: NavController,
+    public alertController: AlertController,
     private storageService: StorageService,
     private postDataService: PostDataService) {
 
     this.json;
     this.listpmdetail = [];
     this.job = [];
+    this.route.queryParams.subscribe(params => {
+      this.listpm = null;
+      this.ChangeMonth();
+      this.ngOnInit();
 
+    });
     this.storageService.getUser().then(items => {
       this.items = items;
       // console.log(items);      
@@ -77,24 +84,48 @@ export class UninstallPage implements OnInit {
   click(item, data) {
 
     console.log(item);
-
-    let params = {
-      item: item.value,
-      type: this.type,
-      date: data.planDate,
+    let param = {
+      planID: item.value.planID,
+      empID: this.empid,
+      type: "checkstatus",
     }
+    console.log(param);
 
-    let navigationExtras: NavigationExtras = {
-      queryParams: {
-        data: JSON.stringify(params)
+    this.postDataService.postcheck(param).then(status => {
+      console.log(status);
+
+      if (status == true) {
+        let params = {
+          item: item.value,
+          type: this.type,
+          date: data.planDate,
+        }
+
+        let navigationExtras: NavigationExtras = {
+          queryParams: {
+            data: JSON.stringify(params)
+          }
+        };
+        console.log(navigationExtras);
+
+        this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+      } else {
+        this.status();
       }
-    };
-    console.log(navigationExtras);
-
-    this.navCtrl.navigateForward(['/joball/listpm/detaillistpm'], navigationExtras);
+    });
 
   }
 
+  //#endregion
+
+  //#region alert status
+  async status() {
+    const alert = await this.alertController.create({
+      message: 'ยังไม่ถึงกำหนดรอบการตรวจเช็ค',
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
   //#endregion
 
   //#region ChangMonth
@@ -204,6 +235,7 @@ export class UninstallPage implements OnInit {
 
   //#region Chang MonthNext
   changeMonthNext() {
+    this.load = true;
     // const year = new Date().getFullYear();
     //#region nextmonth
     if (this.month == 'มกราคม') {
@@ -298,15 +330,18 @@ export class UninstallPage implements OnInit {
         }
 
         console.log('listpm', this.listpm);
-
+        if (this.listpm == false) {
+          this.load = false;
+        }
       });
     });
     //#endregion
   }
   //#endregion
-  
+
   //#region ChangMonthBack
   changeMonthBack(value) {
+    this.load = true;
     //#region 
     if (this.month == 'มกราคม') {
       this.month = 'ธันวาคม'
@@ -371,7 +406,7 @@ export class UninstallPage implements OnInit {
     }
 
     //#endregion
-    
+
     if (value == false) {
       this.job.empID = this.empid;
       this.job.month = this.intMonth;
@@ -419,7 +454,9 @@ export class UninstallPage implements OnInit {
         }
 
         console.log('listpm', this.listpm);
-
+        if (this.listpm == false) {
+          this.load = false;
+        }
       });
     });
   }

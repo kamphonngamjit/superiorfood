@@ -38,15 +38,16 @@ export class JobdetailPage implements OnInit {
   planID;
   tranID;
   insID;
+  newinsID
   image;
   type;
+  typeeng;
   isShowImage = true;
   url: SafeResourceUrl;
   sanitizer: DomSanitizer;
   img;
   empID;
   installnew;
-  link = 'http://localhost:41605';
   ShowList = true;
   typethai;
   ShowCM = false;
@@ -77,7 +78,12 @@ export class JobdetailPage implements OnInit {
   isShowImage11 = false;
   isShowImage12 = false;
   isShowImage13 = false;
-  
+  shows;
+  isdevice = false;
+  isspare = false;
+  devices;
+  spares;
+  typeChang;
   //#endregion
 
   //#region constructor
@@ -93,10 +99,12 @@ export class JobdetailPage implements OnInit {
       this.query = JSON.parse(params["data"]);
       this.data = this.query.data
       this.insID = this.query.installID
+      this.newinsID = this.query.newinstallID
       this.tranID = this.query.tranID
       this.type = this.query.type
       this.planID = this.query.planID
       console.log("query", this.query);
+      this.ngOnInit();
     });
 
     this.storageService.getUser().then(items => {
@@ -110,8 +118,8 @@ export class JobdetailPage implements OnInit {
         console.log(this.empID);
       }
       this.postDataService.apiServer_url
-      
-      this.url = sanitizer.bypassSecurityTrustResourceUrl(this.postDataService.apiServer_url +'Web/CK_CheckInfo.aspx' + '?empID=' + this.empID + '&serviceplanid=' + this.planID + '&installplanid=' + this.insID);
+
+      this.url = sanitizer.bypassSecurityTrustResourceUrl(this.postDataService.apiServer_url + 'Web/CK_CheckInfo.aspx' + '?empID=' + this.empID + '&serviceplanid=' + this.planID + '&installplanid=' + this.insID);
     });
   }
   //#endregion
@@ -120,23 +128,32 @@ export class JobdetailPage implements OnInit {
   ngOnInit() {
     if (this.type == "INSTALL") {
       this.typethai = "งานติดตั้ง"
+      this.typeeng = 'Install'
       console.log(this.typethai);
     }
     else if (this.type == "CM") {
-      this.typethai = "งานซ๋อม"
+      this.typethai = "งานซ่อม"
+      this.typeeng = 'TK'
+      this.checkcm();
     }
     else if (this.type == "PM") {
       this.typethai = "งานตรวจเช็ค"
+      this.typeeng = 'PM'
     }
     else if (this.type == "UNINSTALL") {
       this.typethai = "งานถอนการติดตั้ง"
+      this.typeeng = 'Uninstall'
     }
     if (this.type != "PM") {
       this.ShowList = false;
     }
+    if (this.type == "CM") {
+      this.jobdetail.insID = this.newinsID;
+    } else {
+      this.jobdetail.insID = this.insID;
+    }
     this.jobdetail.planID = this.planID;
     this.jobdetail.tranID = this.tranID;
-    this.jobdetail.insID = this.insID;
     this.jobdetail.type = this.type
 
     console.log(this.jobdetail);
@@ -148,7 +165,7 @@ export class JobdetailPage implements OnInit {
         this.image = JSON.parse(this.result[i].image);
       }
       console.log(this.image);
-  
+
       for (let v = 0; v < this.image.length; v++) {
         if (this.image[v].type == "step1_pic1") {
           this.img.src1 = this.postDataService.apiServer_url + this.image[v].file_path
@@ -216,7 +233,7 @@ export class JobdetailPage implements OnInit {
           console.log("13", this.img.src13);
         }
         console.log(this.booimg12);
-        
+
         console.log(this.booimg13)
       }
       this.isShowImage1 = this.booimg1;
@@ -228,16 +245,69 @@ export class JobdetailPage implements OnInit {
       this.isShowImage7 = this.booimg7;
       this.isShowImage8 = this.booimg8;
       this.isShowImage9 = this.booimg9;
-      this.isShowImage10  = this.booimg10;
-      this.isShowImage11  = this.booimg11;
+      this.isShowImage10 = this.booimg10;
+      this.isShowImage11 = this.booimg11;
       this.isShowImage12 = this.booimg12;
       this.isShowImage13 = this.booimg13;
     });
   }
   //#endregion
 
+
+  checkcm() {
+    let param = {
+      installID: this.insID,
+      typedevice: "CheckCM",
+      empID: this.empID,
+      planID: this.planID,
+    }
+    console.log(param);
+
+    this.postDataService.postdevice(param).then(data => {
+      this.shows = data
+      console.log(this.shows);
+
+      if (this.shows == "device") {
+        this.typeChang = "เครื่อง"
+        this.showdevice();
+      } else if (this.shows == "spare") {
+        this.typeChang = "อะไหล่"
+        this.showspare();
+      }
+    });
+  }
+
+  showdevice() {
+    let param = {
+      installID: this.insID,
+      typedevice: "GetDeviceTran",
+      empID: this.empID,
+      planID: this.planID,
+    }
+    this.postDataService.postdevice(param).then(data => {
+      this.devices = data
+      this.isdevice = true;
+      console.log(this.devices);
+
+    });
+  }
+
+  showspare() {
+    let param = {
+      installID: this.insID,
+      typedevice: "GetSpareTran",
+      empID: this.empID,
+      planID: this.planID,
+    }
+    this.postDataService.postdevice(param).then(data => {
+      this.devices = data
+      this.isspare = true;
+      console.log(this.spares);
+    });
+  }
+
   //#region 
-  async editChecklist(){
+  async editChecklist() {
     const modal = await this.modalController.create({
       component: ChecklistPage,
       cssClass: 'my-custom-modal-css-pm',

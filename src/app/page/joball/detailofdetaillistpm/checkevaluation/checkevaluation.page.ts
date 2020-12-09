@@ -92,12 +92,12 @@ export class CheckevaluationPage implements OnInit {
       console.log(data);
       if (data == "true") {
         this.modalController.dismiss(0);
-      }else{
+      } else {
         this.alertFail()
         // this.modalController.dismiss(1);
       }
     });
-    
+
   }
   //#endregion
   // getEva(){

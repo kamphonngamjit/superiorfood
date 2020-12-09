@@ -26,12 +26,18 @@ import { ChecklistPageModule } from '../app/page/joball/detailofdetaillistpm/che
 import { ModalpopPageModule } from '../app/page/overview/modalpop/modalpop.module';
 import { ChecklistcmPageModule } from '../app/page/joball/detailofdetaillistpm/checklistcm/checklistcm.module';
 import { ShowimginstallPageModule } from '../app/page/job/showimginstall/showimginstall.module';
+import { ChangpasswordPageModule } from '../app/page/setting/changpassword/changpassword.module';
 import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SQLite } from '@ionic-native/sqlite/ngx';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Network } from '@ionic-native/network/ngx';
+import { AppVersion } from '@ionic-native/app-version/ngx';
+import { BrowserTab } from '@ionic-native/browser-tab/ngx';
+import { AuthGuardGuard } from '../app/auth/auth-guard.guard';
+import { PartsWaitingListPageModule } from '../app/page/sparepart/parts-waiting-list/parts-waiting-list.module';
+import { LogPageModule } from '../app/page/detaillistpm/log/log.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -52,13 +58,17 @@ import { Network } from '@ionic-native/network/ngx';
     CheckevaluationPageModule,
     ModalpopPageModule,
     ChecklistPageModule,
+    PartsWaitingListPageModule,
     ChangsparepartPageModule,
     ChecklistcmPageModule,
     ShowimginstallPageModule,
+    ChangpasswordPageModule,
+    LogPageModule,
     HttpClientModule,
     NgbModule,
   ],
   providers: [
+    AuthGuardGuard,
     StatusBar,
     SplashScreen,
     ScreenOrientation,
@@ -66,6 +76,8 @@ import { Network } from '@ionic-native/network/ngx';
     Network,
     Camera,
     SQLite,
+    AppVersion,
+    BrowserTab,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AuthServiceService,
     BarcodeScanner,
